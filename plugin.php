@@ -3,7 +3,7 @@
 Plugin Name: Tag Sticky Post
 Plugin URI: http://tommcfarlin.com/tag-sticky-post/
 Description: Mark a post to be placed at the top of a specified tag archive. It's sticky posts specifically for tags.
-Version: 1.0
+Version: 1.1
 Author: Tom McFarlin
 Author URI: http://tommcfarlin.com
 Author Email: tom@tommcfarlin.com
@@ -36,24 +36,43 @@ class Tag_Sticky_Post {
 	 */
 	function __construct() {
 
+		// Setup the activation hook specifically for checking for the custom.css file
+		register_activation_hook( __FILE__, array( $this, 'activate' ) );
+
 		// Tag Meta Box actions
-		add_action( 'add_meta_boxes', array( &$this, 'add_tag_sticky_post_meta_box' ) );
-		add_action( 'save_post', array( &$this, 'save_tag_sticky_post_data' ) );
-		add_action( 'wp_ajax_is_tag_sticky_post', array( &$this, 'is_tag_sticky_post' ) );
+		add_action( 'add_meta_boxes', array( $this, 'add_tag_sticky_post_meta_box' ) );
+		add_action( 'save_post', array( $this, 'save_tag_sticky_post_data' ) );
+		add_action( 'wp_ajax_is_tag_sticky_post', array( $this, 'is_tag_sticky_post' ) );
 				
 		// Filters for displaying the sticky tag posts
-		add_filter( 'post_class', array( &$this, 'set_tag_sticky_class' ) );
-		add_filter( 'the_posts', array( &$this, 'reorder_tag_posts' ) );
+		add_filter( 'post_class', array( $this, 'set_tag_sticky_class' ) );
+		add_filter( 'the_posts', array( $this, 'reorder_tag_posts' ) );
 		
 		// Stylesheets
-		add_action( 'admin_enqueue_scripts', array( &$this, 'add_admin_styles_and_scripts' ) );
-		add_action( 'wp_enqueue_scripts', array( &$this, 'add_styles' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'add_admin_styles_and_scripts' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'add_styles' ) );
 
 	} // end constructor
 	
 	/*---------------------------------------------*
 	 * Action Functions
 	 *---------------------------------------------*/
+	
+	 /**
+	  * Checks to see if a custom.css file exists. If not, creates it; otherwise, does nothing. This will
+	  * prevent customizations from being overwritten in future upgrades.
+	  */
+	 function activate() {
+		 
+		 // The path where the custom.css should be stored.
+		 $str_custom_path =  dirname( __FILE__ ) . '/css/custom.css';
+		 
+		 // If the custom.css file doesn't exist, then we create it
+		 if( ! file_exists( $str_custom_path ) ) {
+			 file_put_contents( $str_custom_path, '' );
+		 } // end if
+		 
+	 } // end activate
 	
 	/**
 	 * Renders the meta box for allowing the user to select a tag in which to stick a given post.
@@ -63,7 +82,7 @@ class Tag_Sticky_Post {
 		add_meta_box(
 			'post_is_tag_sticky',
 			__( 'Tag Sticky', 'tag-sticky-post' ),
-			array( &$this, 'tag_sticky_post_display' ),
+			array( $this, 'tag_sticky_post_display' ),
 			'post',
 			'side',
 			'low'
