@@ -3,7 +3,7 @@
 Plugin Name: Tag Sticky Post
 Plugin URI: http://tommcfarlin.com/tag-sticky-post/
 Description: Mark a post to be placed at the top of a specified tag archive. It's sticky posts specifically for tags.
-Version: 1.1
+Version: 1.1.1
 Author: Tom McFarlin
 Author URI: http://tommcfarlin.com
 Author Email: tom@tommcfarlin.com
@@ -36,8 +36,13 @@ class Tag_Sticky_Post {
 	 */
 	function __construct() {
 
-		// Setup the activation hook specifically for checking for the custom.css file
+		/* Setup the activation hook specifically for checking for the custom.css file
+		 * I'm calling the same function using the activation hook - which is when the user activates the plugin,
+		 * and during upgrade plugin event. This ensures that the custom.css file can also be managed
+		 * when the plugin is updated.
+		 */
 		register_activation_hook( __FILE__, array( $this, 'activate' ) );
+		add_action( 'pre_set_site_transient_update_plugins', array( $this, 'activate' ) );
 
 		// Tag Meta Box actions
 		add_action( 'add_meta_boxes', array( $this, 'add_tag_sticky_post_meta_box' ) );
@@ -68,7 +73,7 @@ class Tag_Sticky_Post {
 		 $str_custom_path =  dirname( __FILE__ ) . '/css/custom.css';
 		 
 		 // If the custom.css file doesn't exist, then we create it
-		 if( ! file_exists( $str_custom_path ) ) {
+		 if( is_writable( $str_custom_path ) && ! file_exists( $str_custom_path ) ) {
 			 file_put_contents( $str_custom_path, '' );
 		 } // end if
 		 
