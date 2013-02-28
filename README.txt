@@ -3,8 +3,8 @@ Contributors: tommcfarlin
 Donate link: http://tommcfarlin.com/tag-sticky-post/
 Tags: tags, post
 Requires at least: 3.4.1
-Tested up to: 3.5
-Stable tag: 1.1.2
+Tested up to: 3.5.1
+Stable tag: 1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,11 @@ For more information or to follow the project, check out the [project page](http
 4. The post dashboard indicating which entries are tag sticky posts
 
 == Changelog ==
+
+= 1.2 =
+* Introducing support for multiple tags in the querying string. So if your URL contains `tag/tag1+tag2+tag3` and a post is tagged in that set, it will be highlighted.
+* Added several private helper functions to impropve code readability
+* Improved the meta data serialization process by refactoring the code
 
 = 1.1.2 =
 * Removing the custom.css support as it was causing issues with other plugin upgrades. Will be restored later, if requested.

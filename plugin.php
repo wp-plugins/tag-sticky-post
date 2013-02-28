@@ -3,13 +3,13 @@
 Plugin Name: Tag Sticky Post
 Plugin URI: http://tommcfarlin.com/tag-sticky-post/
 Description: Mark a post to be placed at the top of a specified tag archive. It's sticky posts specifically for tags.
-Version: 1.1.2
+Version: 1.2
 Author: Tom McFarlin
 Author URI: http://tommcfarlin.com
 Author Email: tom@tommcfarlin.com
 License:
 
-  Copyright 2012 Tom McFarlin (tom@tommcfarlin.com)
+  Copyright 2012 - 2013 Tom McFarlin (tom@tommcfarlin.com)
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License, version 2, as 
@@ -58,9 +58,9 @@ class Tag_Sticky_Post {
 		// Stylesheets
 		add_action( 'admin_enqueue_scripts', array( $this, 'add_admin_styles_and_scripts' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'add_styles' ) );
-
+		
 	} // end constructor
-	
+
 	/*---------------------------------------------*
 	 * Action Functions
 	 *---------------------------------------------*/
@@ -132,25 +132,8 @@ class Tag_Sticky_Post {
 	 */
 	function save_tag_sticky_post_data( $post_id ) {
 	
-		if( isset( $_POST['tag_sticky_post_nonce'] ) && isset( $_POST['post_type'] ) ) {
-		
-			// Don't save if the user hasn't submitted the changes
-			if( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-				return;
-			} // end if
-			
-			// Verify that the input is coming from the proper form
-			if( ! wp_verify_nonce( $_POST['tag_sticky_post_nonce'], plugin_basename( __FILE__ ) ) ) {
-				return;
-			} // end if
-			
-			// Make sure the user has permissions to post
-			if( 'post' == $_POST['post_type']) {
-				if( ! current_user_can( 'edit_post', $post_id ) ) {
-					return;
-				} // end if
-			} // end if/else
-		
+		if( $this->user_can_save( $post_id, 'tag_sticky_post_nonce' ) ) {
+
 			// Read the ID of the category to which we're going to stick this post
 			$tag_id = '';
 			if( isset( $_POST['tag_sticky_post'] ) ) {
@@ -179,19 +162,16 @@ class Tag_Sticky_Post {
 		if( 'post' == $screen->id ) { 
 	
 			// admin stylesheet
-			wp_register_style( 'tag-sticky-post', plugins_url( '/tag-sticky-post/css/admin.css' ) );
-			wp_enqueue_style( 'tag-sticky-post' );
+			wp_enqueue_style( 'tag-sticky-post', plugins_url( '/tag-sticky-post/css/admin.css' ) );
 
 			// post editor javascript
-			wp_register_script( 'tag-sticky-post-editor', plugins_url( '/tag-sticky-post/js/editor.min.js' ), array( 'jquery' ) );
-			wp_enqueue_script( 'tag-sticky-post-editor' );
+			wp_enqueue_script( 'tag-sticky-post-editor', plugins_url( '/tag-sticky-post/js/editor.min.js' ), array( 'jquery' ) );
 		
 		// And only register the JavaScript for the post listing page
 		} elseif( 'edit-post' == $screen->id ) {
 		
 			// posts display javascript
-			wp_register_script( 'tag-sticky-post', plugins_url( '/tag-sticky-post/js/admin.min.js' ), array( 'jquery' ) );
-			wp_enqueue_script( 'tag-sticky-post' );
+			wp_enqueue_script( 'tag-sticky-post', plugins_url( '/tag-sticky-post/js/admin.min.js' ), array( 'jquery' ) );
 		
 		} // end if
 		
@@ -204,10 +184,7 @@ class Tag_Sticky_Post {
 	
 		// Only render the stylesheet if we're on an archive page
 		if( is_archive() ) {
-			
-			wp_register_style( 'tag-sticky-post', plugins_url( '/tag-sticky-post/css/plugin.css' ) );
-			wp_enqueue_style( 'tag-sticky-post' );
-			
+			wp_enqueue_style( 'tag-sticky-post', plugins_url( '/tag-sticky-post/css/plugin.css' ) );
 		} // end if
 		
 	} // end add_styles
@@ -244,15 +221,15 @@ class Tag_Sticky_Post {
 	  * @return				The updated array of classes for our posts
 	  */
 	 function set_tag_sticky_class( $classes ) {
-
-		 // Determine which tag archive we're on
-		 if( null != ( $tag = get_term_by( 'slug', get_query_var( 'tag' ), 'post_tag' ) ) ) {
-			
+	
+		 // Get the tag either from multiple query string variables or the query var
+		 if( ( $tag = $this->get_sticky_post() ) ) {
+			 
 			 // If we're on an archive and the current category ID matches the category of the given post, add the class name
 			 if( is_archive() && 0 == get_query_var( 'paged' ) && $tag->term_id == get_post_meta( get_the_ID(), 'tag_sticky_post', true ) ) {
 				 $classes[] = 'tag-sticky';
 			 } // end if
-			 
+		 
 		 } // end if
 		 
 		 return $classes;
@@ -347,6 +324,87 @@ class Tag_Sticky_Post {
 		return $has_sticky_post;
 
 	} // end tag_has_sticky_post
+	
+	/**
+	 * Determines if the user is querying multiple tags.
+	 *
+	 * @return	bool	True if multiple tags are in the URL; otherwise, false.
+	 * @version	1.0
+	 * @since	1.2
+	 */
+	private function get_multiple_tags() {
+		
+		// First, determine if there are multiple tags. If so, read them into an array
+		$all_tags = array();		
+		if( 0 < strpos( get_query_var( 'tag' ), '+' ) ) { 
+			$all_tags = explode( '+', get_query_var( 'tag' ) );
+		} // end if
+		
+		return $all_tags;
+		
+	} // end querying_multiple_tags
+	
+	/**
+	 * Determines if a sticky tag exists in multiple tags. If so, returns the tag.
+	 *
+	 * @param	array	$all_tags	The set of tags specified in the query string
+	 * @return	object	$tag		The tag that was found in the query string
+	 * @version	1.0
+	 * @since	1.2
+	 */
+	private function includes_sticky_post( $all_tags ) {
+		
+		$tag = null;
+		
+		// Next, determine which tag in the array is what we're looking at
+		foreach( $all_tags as $tag ) {
+			
+			$tag = get_term_by( 'slug', $tag, 'post_tag' );
+			if( $tag->term_id == get_post_meta( get_the_ID(), 'tag_sticky_post', true ) ) {
+				break;
+			} // end if
+			
+		} // end foreach
+		
+		return $tag;
+		
+	} // end includes_sticky_post
+	
+	/**
+	 * Retrieves the tag for the post based on if it's queried in multiple variables or not.
+	 *
+	 * @return	object	$tag		The tag sticky post that was found in the query var or the query string collection
+	 * @version	1.0
+	 * @since	1.2
+	 */
+	private function get_sticky_post() {
+	
+		$all_tags = $this->get_multiple_tags();
+		$tag_from_multiple = $this->includes_sticky_post( $all_tags );
+		$tag_from_query = get_term_by( 'slug', get_query_var( 'tag' ), 'post_tag' );
+		
+		return null == $tag_from_multiple ? $tag_from_query : $tag_from_multiple;
+
+	} // end has_sticky_post
+	
+	/**
+	 * Determines whether or not the current user has the ability to save meta data associated with this post.
+	 *
+	 * @param		int		$post_id	The ID of the post being save
+	 * @param		bool				Whether or not the user has the ability to save this post.
+	 * @version		1.0
+	 * @since		1.2
+	 */
+	private function user_can_save( $post_id, $nonce ) {
+		
+	    $is_autosave = wp_is_post_autosave( $post_id );
+	    $is_revision = wp_is_post_revision( $post_id );
+	    $is_valid_nonce = ( isset( $_POST[ $nonce ] ) && wp_verify_nonce( $_POST[ $nonce ], plugin_basename( __FILE__ ) ) );
+	    
+	    // Return true if the user is able to save; otherwise, false.
+	    return ! ( $is_autosave || $is_revision ) && $is_valid_nonce;
+	
+	} // end user_can_save
 	
 } // end class
 
