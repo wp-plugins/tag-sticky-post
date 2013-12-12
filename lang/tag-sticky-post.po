@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Comment Images 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-13 22:35-0500\n"
-"PO-Revision-Date: 2012-12-13 22:35-0500\n"
+"POT-Creation-Date: 2013-12-12 17:44-0500\n"
+"PO-Revision-Date: 2013-12-12 17:44-0500\n"
 "Last-Translator: Tom McFarlin <tom@tommcfarlin.com>\n"
 "Language-Team: Tom McFarlin <tom@tommcfarlin.com>\n"
 "Language: en_US\n"
@@ -12,17 +12,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 1.5.4\n"
+"X-Generator: Poedit 1.6.2\n"
 "X-Poedit-SearchPath-0: ..\n"
 
-#: ../plugin.php:89
+#: ../class-tag-sticky-post.php:103
 msgid "Tag Sticky"
 msgstr ""
 
-#: ../plugin.php:114
+#: ../class-tag-sticky-post.php:130
 msgid "Select a tag..."
 msgstr ""
 
-#: ../plugin.php:227
+#: ../class-tag-sticky-post.php:220
 msgid " - Tag Sticky Post"
 msgstr ""

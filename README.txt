@@ -3,8 +3,8 @@ Contributors: tommcfarlin
 Donate link: http://tommcfarlin.com/tag-sticky-post/
 Tags: tags, post
 Requires at least: 3.4.1
-Tested up to: 3.5.1
-Stable tag: 1.2
+Tested up to: 3.8.0
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,12 @@ For more information or to follow the project, check out the [project page](http
 4. The post dashboard indicating which entries are tag sticky posts
 
 == Changelog ==
+
+= 2.0.0 =
+* Implementing the singleton pattern
+* Adding support for custom post types
+* Adding a file to invoke an instance of the plugin
+* WordPress 3.8 compatibility
 
 = 1.2 =
 * Introducing support for multiple tags in the querying string. So if your URL contains `tag/tag1+tag2+tag3` and a post is tagged in that set, it will be highlighted.
