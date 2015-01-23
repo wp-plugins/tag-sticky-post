@@ -8,13 +8,13 @@
  * @author    Tom McFarlin <tom@tommcfarlin.com>
  * @license   GPL-2.0+
  * @link      http://tommcfarlin.com/tag-sticky-post/
- * @copyright 2013 - 2014 Tom McFarlin
+ * @copyright 2013 - 2015 Tom McFarlin
  *
  * @wordpress-plugin
  * Plugin Name: Tag Sticky Post
  * Plugin URI: 	http://tommcfarlin.com/tag-sticky-post/
  * Description: Mark a post to be placed at the top of a specified category archive. It's sticky posts specifically for categories.
- * Version:     2.1.0
+ * Version:     2.2.0
  * Author:      Tom McFarlin
  * Author URI:  http://tommcfarlin.com
  * Text Domain: tag-sticky-post
