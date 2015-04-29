@@ -14,7 +14,7 @@
  * Plugin Name: Tag Sticky Post
  * Plugin URI: 	http://tommcfarlin.com/tag-sticky-post/
  * Description: Mark a post to be placed at the top of a specified category archive. It's sticky posts specifically for categories.
- * Version:     2.2.0
+ * Version:     2.3.0
  * Author:      Tom McFarlin
  * Author URI:  http://tommcfarlin.com
  * Text Domain: tag-sticky-post

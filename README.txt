@@ -4,7 +4,7 @@ Donate link: http://tommcfarlin.com/tag-sticky-post/
 Tags: tags, post
 Requires at least: 3.4.1
 Tested up to: 4.2.1
-Stable tag: 2.2.0
+Stable tag: 2.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,9 @@ For more information or to follow the project, check out the [project page](http
 4. The post dashboard indicating which entries are tag sticky posts
 
 == Changelog ==
+
+= 2.3.0 =
+* WordPress 4.2.1 compatibility
 
 = 2.2.0 =
 * WordPress 4.1 compatibility
